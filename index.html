@@ -91,7 +91,7 @@
         </button>
       </form>
 
-      <!-- KOTAK MOTIVASI WARGA & PETUNJUK AKSES WARGA (PASSWORD ADMIN/PETUGAS AMAN) -->
+      <!-- KOTAK MOTIVASI WARGA & PETUNJUK AKSES WARGA -->
       <div class="p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-left space-y-2">
         <div class="flex items-start gap-2">
           <i class="fa-solid fa-seedling text-emerald-600 text-sm mt-0.5 flex-shrink-0"></i>
@@ -127,6 +127,11 @@
           <span class="text-[11px] block text-emerald-200" id="currentDateDisplay">Memuat...</span>
           <span class="text-xs font-bold bg-emerald-950/70 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30 inline-block mt-0.5" id="navSaldoBadge">Kas: Rp 0</span>
         </div>
+        <!-- Status Cloud Google Sheets -->
+        <button onclick="sinkronkanDariCloud(true)" title="Status Cloud Drive: Klik untuk Sinkronkan" class="h-8 px-2 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center gap-1.5 text-xs ml-1 transition-all">
+          <i id="cloudStatusIcon" class="fa-solid fa-cloud-arrow-up text-emerald-300"></i>
+          <span id="cloudStatusText" class="hidden sm:inline text-[10px] font-semibold">Tersinkron</span>
+        </button>
         <button onclick="handleLogout()" title="Keluar / Ganti Akun" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xs ml-1 transition-all">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
         </button>
@@ -180,9 +185,12 @@
           <p class="text-xs text-emerald-100/90 mt-0.5">"Rutinitas koin mingguan yang konsisten adalah wujud kepedulian nyata bagi lingkungan Griya Kebonagung yang bersih, aman, dan guyub."</p>
         </div>
       </div>
-      <div id="btnPemberitahuanWaWrap" class="flex-shrink-0">
-        <button onclick="bukaModalBroadcastWa()" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-emerald-950 font-bold rounded-xl text-xs flex items-center gap-2 shadow-sm transition-all">
-          <i class="fa-brands fa-whatsapp text-sm"></i> Kirim Info Jadwal WA
+      <div id="btnPemberitahuanWaWrap" class="flex-shrink-0 flex gap-2">
+        <button onclick="bukaModalBroadcastWa()" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-emerald-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition-all">
+          <i class="fa-brands fa-whatsapp text-sm"></i> Info Jadwal WA
+        </button>
+        <button onclick="sinkronkanDariCloud(true)" class="px-3 py-2 bg-white/15 hover:bg-white/25 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition-all">
+          <i class="fa-solid fa-rotate text-xs"></i> Update Kas
         </button>
       </div>
     </div>
@@ -219,7 +227,7 @@
         </div>
       </div>
 
-      <!-- Quick Action Mobile Card (Khusus Admin / Petugas) -->
+      <!-- Quick Action Mobile Card -->
       <div id="boxCepatKeliling" class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-4 text-white shadow-md flex items-center justify-between">
         <div>
           <h3 class="font-bold text-sm md:text-base">Mulai Keliling Jimpitan?</h3>
@@ -230,10 +238,10 @@
         </button>
       </div>
 
-      <!-- Notifikasi Khusus Warga Read-Only -->
+      <!-- Notifikasi Warga Read-Only -->
       <div id="boxInfoWarga" class="hidden bg-blue-50 border border-blue-200 rounded-2xl p-4 text-blue-900 text-xs flex items-center gap-3">
         <i class="fa-solid fa-circle-info text-blue-600 text-xl flex-shrink-0"></i>
-        <p>Anda masuk sebagai <strong>Warga (Mode Lihat)</strong>. Anda dapat melihat transparansi pembukuan kas jimpitan RT 27 dan mengunduh laporan bulanan maupun matriks tahunan.</p>
+        <p>Anda masuk sebagai <strong>Warga (Mode Lihat)</strong>. Anda dapat melihat transparansi pembukuan kas jimpitan RT 27 yang tersinkronisasi langsung dari Google Drive RT.</p>
       </div>
 
       <!-- Grafik Tren -->
@@ -471,9 +479,32 @@
 
     <!-- VIEW 6: PENGATURAN (ADMIN ONLY) -->
     <section id="view-pengaturan" class="hidden space-y-4">
+      <!-- Pengaturan Sinkronisasi Google Sheets / Drive -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-3">
+        <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+          <i class="fa-brands fa-google-drive text-emerald-600"></i> Integrasi Google Sheets & Drive RT
+        </h3>
+        <p class="text-xs text-slate-500">Masukkan tautan URL Web App Google Apps Script dari spreadsheet Google Drive Anda agar data otomatis tersinkronisasi antar-perangkat.</p>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">URL Web App Google Apps Script</label>
+          <input type="text" id="settingScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-emerald-500">
+          <span class="text-[11px] text-slate-400">Kosongkan jika hanya ingin memakai penyimpanan offline lokal peramban.</span>
+        </div>
+
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button onclick="simpanScriptUrl()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow">
+            Simpan & Hubungkan
+          </button>
+          <button onclick="sinkronkanDariCloud(true)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border border-slate-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate text-xs"></i> Uji Sinkron Sekarang
+          </button>
+        </div>
+      </div>
+
       <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-4">
         <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-gear text-emerald-600"></i> Pengaturan Aplikasi
+          <i class="fa-solid fa-gear text-emerald-600"></i> Preferensi Penarikan
         </h3>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -499,7 +530,7 @@
         <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
           <i class="fa-solid fa-database text-teal-600"></i> Cadangkan & Pulihkan Database
         </h3>
-        <p class="text-xs text-slate-500">Gunakan file JSON untuk memindahkan data antar-smartphone petugas atau mengirim data ke bendahara.</p>
+        <p class="text-xs text-slate-500">Gunakan file JSON untuk cadangan manual sewaktu-waktu.</p>
 
         <div class="flex flex-wrap gap-2 pt-1">
           <button onclick="backupDatabase()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-2">
@@ -710,6 +741,7 @@
     const STORAGE_KEY_PENGELUARAN = 'SIJIMPITAN_PENGELUARAN_RT27';
     const STORAGE_KEY_SETTINGS = 'SIJIMPITAN_SETTINGS_RT27';
     const STORAGE_KEY_AUTH = 'SIJIMPITAN_AUTH_SESSION_RT27';
+    const STORAGE_KEY_SCRIPT_URL = 'SIJIMPITAN_GAS_URL_RT27';
 
     // Password terkonfigurasi (Semua Huruf Kecil)
     const AUTH_CREDENTIALS = {
@@ -726,11 +758,13 @@
       defaultNominal: 2000,
       namaPetugas: 'Bpk. Wawan (Koord Jimpitan)'
     };
+    let googleScriptUrl = localStorage.getItem(STORAGE_KEY_SCRIPT_URL) || '';
     let currentLaporanMode = 'mingguan';
     let chartMingguanInstance = null;
     let chartBulananInstance = null;
+    let isSyncing = false;
 
-    // --- 2. AUTHENTICATION CONTROLLER (ROBUST & SAFE) ---
+    // --- 2. AUTHENTICATION CONTROLLER ---
     function checkAuthSession() {
       try {
         const savedRole = sessionStorage.getItem(STORAGE_KEY_AUTH);
@@ -757,9 +791,8 @@
       if (!roleElem || !passElem) return;
 
       const role = roleElem.value.trim().toLowerCase();
-      const pass = passElem.value.trim(); // Menghilangkan spasi tidak sengaja
+      const pass = passElem.value.trim();
 
-      // Validasi kredensial login
       if (AUTH_CREDENTIALS[role] && AUTH_CREDENTIALS[role] === pass) {
         currentUserRole = role;
         
@@ -769,7 +802,6 @@
           console.warn('Storage permission issue:', storageErr);
         }
 
-        // Sembunyikan layar login modal
         const loginModal = document.getElementById('loginScreen');
         if (loginModal) loginModal.classList.add('hidden');
         
@@ -777,7 +809,9 @@
         applyRolePermissions(role);
         switchTab('dashboard');
 
-        // Notifikasi login aman
+        // Otomatis sinkronkan dari Google Sheets saat login berhasil
+        sinkronkanDariCloud(false);
+
         if (typeof Swal !== 'undefined' && Swal.fire) {
           Swal.fire({
             icon: 'success',
@@ -947,7 +981,7 @@
       }
     }
 
-    // --- 5. INITIALIZATION & STORAGE ---
+    // --- 5. INITIALIZATION & STORAGE (HYBRID LOCAL + GOOGLE SHEETS) ---
     const formatRupiah = (num) => {
       return new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -973,15 +1007,146 @@
       if (storedSet) {
         appSettings = JSON.parse(storedSet);
       }
-      saveAll();
+      saveLocalOnly();
     }
 
-    function saveAll() {
+    function saveLocalOnly() {
       localStorage.setItem(STORAGE_KEY_WARGA, JSON.stringify(wargaList));
       localStorage.setItem(STORAGE_KEY_TRANSAKSI, JSON.stringify(transaksiList));
       localStorage.setItem(STORAGE_KEY_PENGELUARAN, JSON.stringify(pengeluaranList));
       localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(appSettings));
       updateGlobalMetrics();
+    }
+
+    function setCloudStatus(status) {
+      const icon = document.getElementById('cloudStatusIcon');
+      const text = document.getElementById('cloudStatusText');
+      if (!icon || !text) return;
+
+      if (status === 'syncing') {
+        icon.className = 'fa-solid fa-spinner fa-spin text-amber-300';
+        text.innerText = 'Menyimpan...';
+      } else if (status === 'success') {
+        icon.className = 'fa-solid fa-cloud-arrow-up text-emerald-300';
+        text.innerText = 'Tersinkron';
+      } else if (status === 'offline') {
+        icon.className = 'fa-solid fa-cloud text-slate-400';
+        text.innerText = 'Offline';
+      } else if (status === 'error') {
+        icon.className = 'fa-solid fa-triangle-exclamation text-rose-300';
+        text.innerText = 'Gagal Sync';
+      }
+    }
+
+    // Fungsi Save Utama: Menyimpan lokal lalu otomatis kirim ke Google Sheets di Google Drive
+    function saveAll() {
+      saveLocalOnly();
+
+      if (!googleScriptUrl) {
+        setCloudStatus('offline');
+        return;
+      }
+
+      setCloudStatus('syncing');
+      const payload = {
+        warga: wargaList,
+        transaksi: transaksiList,
+        pengeluaran: pengeluaranList,
+        settings: appSettings,
+        updatedAt: new Date().toISOString()
+      };
+
+      fetch(googleScriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.status === 'success') {
+          setCloudStatus('success');
+        } else {
+          setCloudStatus('error');
+        }
+      })
+      .catch(err => {
+        console.warn('Gagal sinkron ke Google Drive:', err);
+        setCloudStatus('offline');
+      });
+    }
+
+    // Menarik data terbaru dari Google Sheets di Google Drive
+    function sinkronkanDariCloud(showNotification = false) {
+      if (!googleScriptUrl) {
+        if (showNotification && typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: 'URL Belum Diatur',
+            text: 'Silakan masukkan URL Web App Google Apps Script di menu Pengaturan terlebih dahulu.',
+            icon: 'info'
+          });
+        }
+        setCloudStatus('offline');
+        return;
+      }
+
+      setCloudStatus('syncing');
+      fetch(googleScriptUrl)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.transaksi && data.warga) {
+            wargaList = data.warga;
+            transaksiList = data.transaksi;
+            pengeluaranList = data.pengeluaran || [];
+            if (data.settings) appSettings = data.settings;
+
+            saveLocalOnly();
+            renderPenarikan();
+            renderWargaTable();
+            renderPengeluaranTable();
+            renderLaporan();
+            renderDashboardCharts();
+            setCloudStatus('success');
+
+            if (showNotification && typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'success',
+                title: 'Kas Ter-update!',
+                text: 'Data terbaru berhasil dimuat dari Google Drive RT 27.',
+                timer: 1300,
+                showConfirmButton: false
+              });
+            }
+          } else {
+            setCloudStatus('success');
+          }
+        })
+        .catch(err => {
+          console.warn('Gagal memuat data dari cloud:', err);
+          setCloudStatus('offline');
+          if (showNotification && typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Mode Offline Aktif',
+              text: 'Menggunakan data lokal di memori HP. Data akan otomatis dikirim ke Google Drive saat online.'
+            });
+          }
+        });
+    }
+
+    function simpanScriptUrl() {
+      const urlInput = document.getElementById('settingScriptUrl');
+      if (!urlInput) return;
+      const url = urlInput.value.trim();
+
+      googleScriptUrl = url;
+      localStorage.setItem(STORAGE_KEY_SCRIPT_URL, url);
+
+      if (url) {
+        sinkronkanDariCloud(true);
+      } else {
+        setCloudStatus('offline');
+        if (typeof Swal !== 'undefined') Swal.fire('Tersimpan', 'Aplikasi kembali menggunakan mode LocalStorage.', 'info');
+      }
     }
 
     function resetDataBawaan() {
@@ -2176,8 +2341,15 @@ Wassalamu'alaikum Wr. Wb.
       if (nomInp) nomInp.value = appSettings.defaultNominal;
       const petInp = document.getElementById('settingNamaPetugas');
       if (petInp) petInp.value = appSettings.namaPetugas;
+      const scriptUrlInp = document.getElementById('settingScriptUrl');
+      if (scriptUrlInp) scriptUrlInp.value = googleScriptUrl;
 
       checkAuthSession();
+
+      // Cek sinkronisasi cloud saat pertama dibuka
+      if (googleScriptUrl) {
+        sinkronkanDariCloud(false);
+      }
     });
   </script>
 </body>
